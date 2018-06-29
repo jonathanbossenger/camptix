@@ -12,7 +12,7 @@
  * License:     GPLv2
  */
 
-include( plugin_dir_path( __FILE__ ) . 'currencies.php' );
+include( plugin_dir_path( __FILE__ ) . 'inc/class-camptix-currencies.php' );
 
 class CampTix_Plugin {
 	protected $options;
