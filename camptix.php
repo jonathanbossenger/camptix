@@ -1697,15 +1697,20 @@ class CampTix_Plugin {
 		// Enabled/disabled payment methods.
 		if ( isset( $input['payment_methods'] ) ) {
 			$selected_currency_supported = false;
+
 			foreach ( $this->get_available_payment_methods() as $key => $method ) {
-				if ( isset( $input['payment_methods'][ $key ] ) )
+				if ( isset( $input['payment_methods'][ $key ] ) ) {
 					$output['payment_methods'][ $key ] = (bool) $input['payment_methods'][ $key ];
+				}
+
 				if ( $output['payment_methods'][ $key]
-					 && $this->get_payment_method_by_id( $key )->supports_currency( $this->options['currency'] ) ){
+					 && $this->get_payment_method_by_id( $key )->supports_currency( $this->options['currency'] )
+				) {
 					// currently selected currency must be supported by atleast 1 payment method
 					$selected_currency_supported = true;
 				}
 			}
+
 			if ( ! $selected_currency_supported ){
 				add_settings_error(
 					'camptix',
