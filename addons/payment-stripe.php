@@ -108,8 +108,7 @@ class CampTix_Payment_Method_Stripe extends CampTix_Payment_Method {
 		/* translators: used between list items, there is a space after the comma */
 		$description = implode( __( ', ', 'camptix' ), $item_summary );
 
-		wp_register_script( 'stripe-checkout', 'https://checkout.stripe.com/checkout.js', array(), false, true );
-		wp_enqueue_script( 'camptix-stripe', plugins_url( 'camptix-stripe.js', __DIR__ . '/camptix-stripe-gateway.php' ), array( 'stripe-checkout', 'jquery' ), '20170322', true );
+		wp_enqueue_script( 'stripe-checkout', 'https://checkout.stripe.com/checkout.js', array(), false, true );
 
 		try {
 			$amount = $this->get_fractional_unit_amount( $this->camptix_options['currency'], $camptix->order['total'] );
@@ -117,7 +116,7 @@ class CampTix_Payment_Method_Stripe extends CampTix_Payment_Method {
 			$amount = null;
 		}
 
-		wp_localize_script( 'camptix-stripe', 'CampTixStripeData', array(
+		wp_localize_script( 'stripe-checkout', 'CampTixStripeData', array(
 			'public_key'    => $credentials['api_public_key'],
 			'name'          => $this->camptix_options['event_name'],
 			'description'   => trim( $description ),
@@ -191,14 +190,14 @@ class CampTix_Payment_Method_Stripe extends CampTix_Payment_Method {
 	public function payment_settings_fields() {
 		// Allow pre-defined accounts if any are defined by plugins.
 		if ( count( $this->get_predefined_accounts() ) > 0 ) {
-			$this->add_settings_field_helper( 'api_predef', __( 'Predefined Account', 'camptix-stripe-payment-gateway' ), array( $this, 'field_api_predef' ) );
+			$this->add_settings_field_helper( 'api_predef', __( 'Predefined Account', 'camptix' ), array( $this, 'field_api_predef' ) );
 		}
 
 		// Settings fields are not needed when a predefined account is chosen.
 		// These settings fields should *never* expose predefined credentials.
 		if ( ! $this->get_predefined_account() ) {
-			$this->add_settings_field_helper( 'api_secret_key', __( 'Secret Key',      'camptix-stripe-payment-gateway' ), array( $this, 'field_text' ) );
-			$this->add_settings_field_helper( 'api_public_key', __( 'Publishable Key', 'camptix-stripe-payment-gateway' ), array( $this, 'field_text' ) );
+			$this->add_settings_field_helper( 'api_secret_key', __( 'Secret Key',      'camptix' ), array( $this, 'field_text' ) );
+			$this->add_settings_field_helper( 'api_public_key', __( 'Publishable Key', 'camptix' ), array( $this, 'field_text' ) );
 		}
 	}
 
@@ -221,8 +220,8 @@ class CampTix_Payment_Method_Stripe extends CampTix_Payment_Method {
 
 		?>
 
-		<select id="camptix-predef-select" name="<?php echo esc_attr( $args['name'] ); ?>">
-			<option value=""><?php _e( 'None', 'camptix-stripe-payment-gateway' ); ?></option>
+		<select id="camptix-stripe-predef-select" name="<?php echo esc_attr( $args['name'] ); ?>">
+			<option value=""><?php _e( 'None', 'camptix' ); ?></option>
 
 			<?php foreach ( $accounts as $key => $account ) : ?>
 				<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $args['value'], $key ); ?>>
@@ -234,7 +233,7 @@ class CampTix_Payment_Method_Stripe extends CampTix_Payment_Method {
 		<!-- Let's disable the rest of the fields unless None is selected -->
 		<script>
 			jQuery( document ).ready( function( $ ) {
-				var select = $('#camptix-predef-select')[0];
+				var select = $('#camptix-stripe-predef-select')[0];
 
 				$( select ).on( 'change', function() {
 					$( '[name^="camptix_payment_options_stripe"]' ).each( function() {
@@ -351,7 +350,7 @@ class CampTix_Payment_Method_Stripe extends CampTix_Payment_Method {
 		global $camptix;
 
 		if ( ! in_array( $this->camptix_options['currency'], $this->supported_currencies ) ) {
-			wp_die( __( 'The selected currency is not supported by this payment method.', 'camptix-stripe-payment-gateway' ) );
+			wp_die( __( 'The selected currency is not supported by this payment method.', 'camptix' ) );
 		}
 
 		$order = $this->get_order( $payment_token );
